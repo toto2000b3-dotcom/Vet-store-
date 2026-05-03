@@ -1,0 +1,39 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=Vazirmatn:wght@400;500;700;900&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", "Vazirmatn", ui-sans-serif, system-ui, sans-serif;
+  --color-emerald-50: #ecfdf5;
+  --color-emerald-100: #d1fae5;
+  --color-emerald-600: #059669;
+  --color-emerald-700: #047857;
+  --color-emerald-900: #064e3b;
+  --color-orange-500: #f97316;
+  --color-orange-600: #ea580c;
+}
+
+@layer base {
+  html {
+    @apply antialiased;
+    font-family: inherit;
+  }
+  
+  body {
+    @apply bg-emerald-50 text-slate-900 underline-offset-4;
+  }
+}
+
+.rtl {
+  direction: rtl;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-emerald-200 rounded-full hover:bg-emerald-300 transition-colors;
+}

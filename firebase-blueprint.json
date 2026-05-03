@@ -1,0 +1,64 @@
+{
+  "entities": {
+    "Product": {
+      "title": "Product",
+      "description": "A veterinary product available for sale",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "price": { "type": "number" },
+        "category": { "type": "string" },
+        "desc": { "type": "string" },
+        "benefits": { "type": "string" },
+        "illness": { "type": "string" },
+        "image": { "type": "string" },
+        "deliveryFee": { "type": "number" }
+      },
+      "required": ["name", "price", "category"]
+    },
+    "Order": {
+      "title": "Order",
+      "description": "A purchase order made by a customer",
+      "type": "object",
+      "properties": {
+        "productName": { "type": "string" },
+        "price": { "type": "number" },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "customerName": { "type": "string" },
+        "customerPhone": { "type": "string" },
+        "customerAddress": { "type": "string" },
+        "totalPaid": { "type": "number" }
+      },
+      "required": ["productName", "price", "customerName", "customerPhone", "customerAddress", "totalPaid"]
+    },
+    "Clinic": {
+      "title": "Clinic",
+      "description": "A veterinary clinic registration",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "phone": { "type": "string" },
+        "address": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "approved", "rejected"] },
+        "clinicCode": { "type": "string" },
+        "clinicImage": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "phone", "address", "status", "clinicCode"]
+    }
+  },
+  "firestore": {
+    "/products/{productId}": {
+      "schema": "Product",
+      "description": "Collection of veterinary products"
+    },
+    "/orders/{orderId}": {
+      "schema": "Order",
+      "description": "Collection of customer orders"
+    },
+    "/clinics/{clinicId}": {
+      "schema": "Clinic",
+      "description": "Collection of registered clinics awaiting approval"
+    }
+  }
+}

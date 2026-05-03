@@ -1,0 +1,75 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // Product validation
+    function isValidProduct(data) {
+      return data.keys().hasAll(['name', 'price', 'category']) &&
+             data.name is string && data.name.size() > 0 && data.name.size() <= 200 &&
+             data.price is number && data.price >= 0 &&
+             data.category is string && data.category.size() > 0 &&
+             ( !('desc' in data) || (data.desc is string && data.desc.size() <= 1000) ) &&
+             ( !('benefits' in data) || (data.benefits is string && data.benefits.size() <= 1000) ) &&
+             ( !('illness' in data) || (data.illness is string && data.illness.size() <= 500) ) &&
+             ( !('image' in data) || (data.image is string && data.image.size() <= 2000) ) &&
+             ( !('deliveryFee' in data) || (data.deliveryFee is number && data.deliveryFee >= 0) );
+    }
+
+    // Order validation
+    function isValidOrder(data) {
+      return data.keys().hasAll(['productName', 'price', 'customerName', 'customerPhone', 'customerAddress', 'totalPaid', 'timestamp']) &&
+             data.productName is string && data.price is number &&
+             data.customerName is string && data.customerPhone is string &&
+             data.customerAddress is string && data.totalPaid is number &&
+             data.timestamp == request.time;
+    }
+
+    // Clinic validation
+    function isValidClinic(data) {
+      return data.keys().hasAll(['name', 'phone', 'address', 'status', 'clinicCode', 'createdAt']) &&
+             data.name is string && data.phone is string && data.address is string &&
+             data.status in ['pending', 'approved', 'rejected'] &&
+             data.clinicCode is string &&
+             data.createdAt == request.time;
+    }
+
+    match /products/{productId} {
+      allow read: if true;
+      allow create: if isSignedIn() && isValidProduct(incoming());
+      allow update: if isSignedIn() && isValidProduct(incoming());
+      allow delete: if isSignedIn();
+    }
+
+    match /orders/{orderId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && isValidOrder(incoming());
+    }
+
+    match /clinics/{clinicId} {
+      allow read: if true; // Allow checking status during login
+      allow create: if isSignedIn() && isValidClinic(incoming());
+      allow update: if false; // Only admin can update status (manual for now)
+    }
+  }
+}
